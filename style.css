@@ -1,0 +1,15 @@
+header{
+    text-align: center;
+    font-size: 25px;
+}
+.container{
+    height: 400px;
+    width: 400px;
+    border: 1px solid black;
+    margin: auto;
+    display: grid;
+}
+.gridItem{
+    border: 1px solid black;
+    text-align: center;
+}
