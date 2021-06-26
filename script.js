@@ -17,8 +17,26 @@ const gameBoard = (()=>{
             board[index]=sign
             displayController.updateDisplay(board)
         } 
+        gameController.checkWinner(board)
     }
-    return {getBoard,setValue}
+    function resetBoard(){
+        board = [
+            '','','',
+            '','','',
+            '','','',
+        ]
+        displayController.updateDisplay(board)
+    }
+    function isFull(){
+        let flag = true
+        for(let i=0;i<board.length;i++){
+            if(board[i]==''){
+                flag=false
+            }
+        }
+        return flag
+    }
+    return {getBoard,setValue,resetBoard}
 })()
 
 const displayController = (()=>{
@@ -27,7 +45,7 @@ const displayController = (()=>{
     const turnElement = document.querySelector("#turn")
     const player1 = Player('X')
     const player2 = Player('O')
-
+    let winner = ''
     let currentTurn = player1.getSign()
     function init(){
         for(let i=0;i<9;i++){
@@ -63,6 +81,28 @@ const displayController = (()=>{
 })()
 
 const gameController = (()=>{
+    let winConditions = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,4,8],
+        [2,4,6],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8]
+    ]
+    
+    function init(){
 
+    }
+    function checkWinner(board){
+        winConditions.forEach((winCondition)=>{
+            if(board[winCondition[0]]==board[winCondition[1]]
+                &&board[winCondition[1]]==board[winCondition[2]]){
+                console.log(`Winner: Player ${board[winCondition[0]]}`)
+            }
+        })
+    }
+    return {checkWinner}
 })()
 displayController.init()
