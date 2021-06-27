@@ -16,8 +16,11 @@ const gameBoard = (()=>{
         if(board[index]==''){
             board[index]=sign
             displayController.updateDisplay(board)
-        } 
-        gameController.checkWinner(board)
+        }
+        if(gameController.isOver()){
+            displayController.deleteListener()
+            displayController.displayWinner(gameController.getWinner())
+        }
     }
     function resetBoard(){
         board = [
@@ -36,17 +39,19 @@ const gameBoard = (()=>{
         }
         return flag
     }
-    return {getBoard,setValue,resetBoard}
+    return {getBoard,setValue,resetBoard,isFull}
 })()
 
 const displayController = (()=>{
     let gridItems = []
     const container = document.querySelector(".container")
     const turnElement = document.querySelector("#turn")
+    const winnerDisplay = document.querySelector("#winnerDisplay")
+    const restartButton = document.querySelector("#restart")
     const player1 = Player('X')
     const player2 = Player('O')
-    let winner = ''
     let currentTurn = player1.getSign()
+
     function init(){
         for(let i=0;i<9;i++){
             gridItems[i]=document.createElement('div')
@@ -55,14 +60,29 @@ const displayController = (()=>{
             container.append(gridItems[i])
         }
         turnElement.textContent = `Turn: ${currentTurn}`
-        gridItems.forEach(item=>{
-            item.addEventListener('click',()=>{
-                let index = item.dataset.number
-                let sign = currentTurn
-                gameBoard.setValue(index,sign)
-            })
+        addListener()
+        
+        restartButton.addEventListener('click',()=>{
+            gameBoard.resetBoard()
+            clearWinner()
+            gameController.resetWinner()
+            addListener()
         })
-
+    }
+    function addListener(){
+        gridItems.forEach(item=>{
+            item.addEventListener('click',eventFunction)
+        })
+    }
+    function eventFunction(){
+        let index = this.dataset.number
+        let sign = currentTurn
+        gameBoard.setValue(index,sign)
+    }
+    function deleteListener(){
+        gridItems.forEach(item=>{
+            item.removeEventListener('click',eventFunction)
+        })
     }
     function updateDisplay(board){
         for(let i=0;i<9;i++){
@@ -76,8 +96,19 @@ const displayController = (()=>{
         }
         turnElement.textContent = `Turn: ${currentTurn}`
     }
+    function displayWinner(winner){
+        if(winner=='X' || winner=='O'){
+            winnerDisplay.textContent = `Player ${winner} wins!`
+        }
+        else{
+            winnerDisplay.textContent = `Draw!`
+        }
+    }
+    function clearWinner(){
+        winnerDisplay.textContent = ''
+    }
 
-    return {init,updateDisplay}
+    return {init,updateDisplay,deleteListener,displayWinner,clearWinner}
 })()
 
 const gameController = (()=>{
@@ -91,18 +122,36 @@ const gameController = (()=>{
         [1,4,7],
         [2,5,8]
     ]
+    let winner = ''
     
     function init(){
-
+        displayController.init()
     }
-    function checkWinner(board){
+    function hasWinner(board){
+        let flag = false
         winConditions.forEach((winCondition)=>{
             if(board[winCondition[0]]==board[winCondition[1]]
-                &&board[winCondition[1]]==board[winCondition[2]]){
-                console.log(`Winner: Player ${board[winCondition[0]]}`)
+                &&board[winCondition[1]]==board[winCondition[2]]
+                &&board[winCondition[1]]!=''){
+                    winner = board[winCondition[1]]
+                    flag = true
+                    return
             }
         })
+        return flag
     }
-    return {checkWinner}
+    function getWinner(){
+        return winner
+    }
+    function resetWinner(){
+        winner = ''
+    }
+    function isOver(){
+        if(gameBoard.isFull() || hasWinner(gameBoard.getBoard())){
+            return true
+        }
+        return false
+    }
+    return {hasWinner,isOver,getWinner,resetWinner,init}
 })()
 displayController.init()
