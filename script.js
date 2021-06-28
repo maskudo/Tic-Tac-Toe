@@ -154,4 +154,4 @@ const gameController = (()=>{
     }
     return {hasWinner,isOver,getWinner,resetWinner,init}
 })()
-displayController.init()
+gameController.init()
