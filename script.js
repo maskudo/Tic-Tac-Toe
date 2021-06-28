@@ -147,7 +147,7 @@ const gameController = (()=>{
         winner = ''
     }
     function isOver(){
-        if(gameBoard.isFull() || hasWinner(gameBoard.getBoard())){
+        if(hasWinner(gameBoard.getBoard()) || gameBoard.isFull()){
             return true
         }
         return false
